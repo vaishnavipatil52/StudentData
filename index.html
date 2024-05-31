@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        /* CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f2f2f2; 
+        }
+		
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            margin: 0 auto; 
+            width: 30%; 
+            background-color: lightgray;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="email"],
+		
+        select {
+            width: 100%; /* Making input fields full width */
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        /* Centering the text in specific table cells */
+        table td:nth-child(1),
+        table td:nth-child(4),
+        table td:nth-child(5) {
+            text-align: center;
+        }
+        button[type="submit"],
+        button[type="button"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover,
+        button[type="button"]:hover {
+            background-color: red;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .edit-btn,
+        .delete-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .edit-btn:hover,
+        .delete-btn:hover {
+            background-color: blue;
+        }    
+    </style>
+</head>
+<body>
+    <h1>Student Management System</h1>
+    
+    <form id="addStudentForm">
+        <input type="hidden" id="studentIndex">
+       
+	   <label for="name">Enter Name:</label>
+<input type="text" id="name" placeholder="Enter Name" pattern="[A-Za-z ]+" title="Please enter only letters" required><br>
+
+        <label for="department">Department:</label>
+        <select id="department" required>
+            <option value="">Select Department</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Electrical Engineering">Electrical Engineering</option>
+            <option value="Mechanical Engineering">Mechanical Engineering</option>
+
+			</select><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" required><br>
+		
+        <label for="email">Email ID:</label>
+        <input type="email" id="email" required><br>
+		 <label for="gender">Gender:</label>
+		<input type="radio"  id ="male" name="gender" value="male" required> Male
+		<input type="radio"  id ="female" name="gender" value="female" required> female
+		<br><br>
+		
+        <label for="dob">DOB:</label>
+        <input type="date" id="dob" required><br>
+        <button type="submit">Save</button>
+        <button type="button" id="cancelEdit">Cancel</button>
+    </form>
+
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Age</th>
+                <th>Email ID</th>
+                <th>Gender</th>
+				<th>DOB</th>
+				<th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function addStudent(name, department, age, dob, email, gender) {
+            $('#studentTable tbody').append(`
+                <tr>
+                    <td>${name}</td>
+                    <td>${department}</td>
+                    <td>${age}</td>
+                    <td>${email}</td>
+                    <td>${gender}</td>
+                    <td>${dob}</td>
+                    <td>
+                        <button class="edit-btn">Edit</button>
+                        <button class="delete-btn">Delete</button>
+                    </td>
+                </tr>
+            `);
+        }
+
+       
+        $('#addStudentForm').submit(function(event) {
+            event.preventDefault();
+            const name = $('#name').val();
+            const department = $('#department').val();
+            const age = $('#age').val();
+            const email = $('#email').val();
+            const gender = $('input[name="gender"]:checked').val();
+            const dob = $('#dob').val();
+            const index = $('#studentIndex').val();
+
+            if (validateForm(name, department, age, dob, email, gender)) {
+                if (index === '') {
+                    addStudent(name, department, age, dob, email, gender);
+                } else {
+                    const row = $('#studentTable tbody tr').eq(index);
+                    row.find('td:eq(0)').text(name);
+                    row.find('td:eq(1)').text(department);
+                    row.find('td:eq(2)').text(age);
+                    row.find('td:eq(3)').text(email);
+                    row.find('td:eq(4)').text(gender);
+                    row.find('td:eq(5)').text(dob);
+                }
+
+                $(this).get(0).reset();
+                $('#studentIndex').val('');
+            }
+        });
+
+        
+        $(document).on('click', '.edit-btn', function() {
+            const row = $(this).closest('tr');
+            const name = row.find('td:eq(0)').text();
+            const department = row.find('td:eq(1)').text();
+            const age = row.find('td:eq(2)').text();
+            const email = row.find('td:eq(3)').text();
+            const gender = row.find('td:eq(4)').text();
+            const dob = row.find('td:eq(5)').text();
+
+            $('#name').val(name);
+            $('#department').val(department);
+            $('#age').val(age);
+            $('#email').val(email);
+            $('input[name="gender"][value="'+gender+'"]').prop('checked', true);
+            $('#dob').val(dob);
+            $('#studentIndex').val(row.index());
+        });
+
+        
+        $('#cancelEdit').click(function() {
+            $('#addStudentForm').get(0).reset();
+            $('#studentIndex').val('');
+        });
+
+        
+        $(document).on('click', '.delete-btn', function() {
+            $(this).closest('tr').remove();
+        });
+
+       
+        function validateForm(name, department, age, dob, email, gender) {
+            if (name.trim() === '' || department.trim() === '' || age.trim() === '' || dob.trim() === '' || email.trim() === '' || !gender) {
+                alert('Please fill out all fields.');
+                return false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+
+            return true; // Form is valid
+        }
+    </script>
+</body>
+</html>
+
